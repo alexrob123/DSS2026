@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE matchs SYSTEM "games.dtd">
+
+<matchs>
+    <match>
+        <equipe1>Paris Saint-Germain</equipe1>
+        <equipe2>Olympique Lyonnais</equipe2>
+        <domicile>Paris Saint-Germain</domicile>
+
+        <buts>
+            <but>
+                <joueur>Kylian Mbappé</joueur>
+                <minute>12</minute>
+            </but>
+            <but>
+                <joueur>Lionel Messi</joueur>
+                <minute>45</minute>
+                <penalty>oui</penalty>
+            </but>
+            <but>
+                <joueur>Memphis Depay</joueur>
+                <minute>78</minute>
+            </but>
+        </buts>
+
+        <cartons>
+            <carton>
+                <joueur>Marquinhos</joueur>
+                <type>jaune</type>
+            </carton>
+            <carton>
+                <joueur>Lucas Paquetá</joueur>
+                <type>rouge</type>
+            </carton>
+        </cartons>
+    </match>
+
+    <match>
+        <equipe1>Real Madrid</equipe1>
+        <equipe2>FC Barcelone</equipe2>
+        <domicile>Real Madrid</domicile>
+
+        <buts>
+            <but>
+                <joueur>Karim Benzema</joueur>
+                <minute>22</minute>
+            </but>
+        </buts>
+
+        <cartons>
+            <carton>
+                <joueur>Sergio Ramos</joueur>
+                <type>jaune</type>
+            </carton>
+        </cartons>
+    </match>
+</matchs>

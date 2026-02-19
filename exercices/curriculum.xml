@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cv SYSTEM "curriculum.dtd">
+
+<cv>
+    <identite>
+        <nom>Dupont</nom>
+        <prenom>Jean</prenom>
+        <date_naissance>1990-05-12</date_naissance>
+    </identite>
+
+    <contacts>
+        <email>jean.dupont@example.com</email>
+        <telephone>+33 6 12 34 56 78</telephone>
+        <adresse>12 rue de la République, 75001 Paris, France</adresse>
+    </contacts>
+
+    <formation>
+        <diplome>Master Informatique</diplome>
+        <annee>2014</annee>
+        <ecole>Université Paris-Sorbonne</ecole>
+    </formation>
+    <formation>
+        <diplome>Licence Mathématiques</diplome>
+        <annee>2012</annee>
+        <ecole>Université Paris-Sorbonne</ecole>
+    </formation>
+
+    <experience>
+        <poste>Développeur Python</poste>
+        <entreprise>TechCorp</entreprise>
+        <annee_debut>2015</annee_debut>
+        <annee_fin>2018</annee_fin>
+        <description>Développement d'applications web et scripts d'automatisation.</description>
+    </experience>
+    <experience>
+        <poste>Data Scientist</poste>
+        <entreprise>DataSolutions</entreprise>
+        <annee_debut>2018</annee_debut>
+        <annee_fin>2023</annee_fin>
+        <description>Analyse de données et création de modèles prédictifs.</description>
+    </experience>
+
+    <competences>
+        <competence>Python</competence>
+        <competence>SQL</competence>
+        <competence>Machine Learning</competence>
+        <competence>Git</competence>
+    </competences>
+
+    <langues>
+        <langue>
+            <nom>Français</nom>
+            <niveau>Langue maternelle</niveau>
+        </langue>
+        <langue>
+            <nom>Anglais</nom>
+            <niveau>Courant</niveau>
+        </langue>
+    </langues>
+</cv>

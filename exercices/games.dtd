@@ -1,0 +1,17 @@
+<!ELEMENT matchs (match+)>
+
+<!ELEMENT match (equipe1, equipe2, domicile, buts?, cartons?)>
+
+<!ELEMENT equipe1 (#PCDATA)>
+<!ELEMENT equipe2 (#PCDATA)>
+<!ELEMENT domicile (#PCDATA)>
+
+<!ELEMENT buts (but*)>
+<!ELEMENT but (joueur, minute, penalty?)>
+<!ELEMENT joueur (#PCDATA)>
+<!ELEMENT minute (#PCDATA)>
+<!ELEMENT penalty (#PCDATA)>
+
+<!ELEMENT cartons (carton*)>
+<!ELEMENT carton (joueur, type)>
+<!ELEMENT type (#PCDATA)>

@@ -1,0 +1,16 @@
+<!ELEMENT brèves (brève*)>
+
+<!ELEMENT brève (titre, date, photo?, urls?)>
+<!ATTLIST brève
+    thème (actualités | sport | bourse | media) #REQUIRED
+    langue (fr | en) #REQUIRED
+>
+
+<!ELEMENT titre (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT photo (#PCDATA)>
+
+<!ELEMENT urls (url+)>
+<!ELEMENT url (adresse, résumé)>
+<!ELEMENT adresse (#PCDATA)>
+<!ELEMENT résumé (#PCDATA)>

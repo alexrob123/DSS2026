@@ -1,0 +1,31 @@
+<!ELEMENT cv (identite, contacts, formation*, experience*, competences*, langues*)>
+
+<!ELEMENT identite (nom, prenom, date_naissance)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT prenom (#PCDATA)>
+<!ELEMENT date_naissance (#PCDATA)>
+
+<!ELEMENT contacts (email, telephone, adresse)>
+<!ELEMENT email (#PCDATA)>
+<!ELEMENT telephone (#PCDATA)>
+<!ELEMENT adresse (#PCDATA)>
+
+<!ELEMENT formation (diplome, annee, ecole)>
+<!ELEMENT diplome (#PCDATA)>
+<!ELEMENT annee (#PCDATA)>
+<!ELEMENT ecole (#PCDATA)>
+
+<!ELEMENT experience (poste, entreprise, annee_debut, annee_fin, description?)>
+<!ELEMENT poste (#PCDATA)>
+<!ELEMENT entreprise (#PCDATA)>
+<!ELEMENT annee_debut (#PCDATA)>
+<!ELEMENT annee_fin (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+
+<!ELEMENT competences (competence*)>
+<!ELEMENT competence (#PCDATA)>
+
+<!ELEMENT langues (langue*)>
+<!ELEMENT langue (nom, niveau)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT niveau (#PCDATA)>

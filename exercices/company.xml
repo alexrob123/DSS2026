@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE entreprise SYSTEM "company.dtd">
+
+<entreprise>
+
+    <personnes>
+        <personne id="p1">
+            <nom>Dupont Jean</nom>
+            <informations>Développeur Python expérimenté</informations>
+            <projets_participes>
+                <projet_ref ref="proj1"/>
+                <projet_ref ref="proj2"/>
+            </projets_participes>
+        </personne>
+        <personne id="p2">
+            <nom>Martin Claire</nom>
+            <informations>Chef de projet senior</informations>
+            <projets_participes>
+                <projet_ref ref="proj1"/>
+            </projets_participes>
+        </personne>
+        <personne id="p3">
+            <nom>Lopez Carlos</nom>
+            <informations>Designer UI/UX</informations>
+            <projets_participes>
+                <projet_ref ref="proj2"/>
+            </projets_participes>
+        </personne>
+    </personnes>
+
+    <projets>
+        <projet id="proj1">
+            <nom>Site e-commerce</nom>
+            <descriptif>Développement d'une plateforme de vente en ligne.</descriptif>
+            <participants>
+                <personne_ref ref="p1"/>
+                <personne_ref ref="p2"/>
+            </participants>
+        </projet>
+        <projet id="proj2">
+            <nom>Application mobile</nom>
+            <descriptif>Création d'une application mobile pour iOS et Android.</descriptif>
+            <participants>
+                <personne_ref ref="p1"/>
+                <personne_ref ref="p3"/>
+            </participants>
+        </projet>
+    </projets>
+
+</entreprise>

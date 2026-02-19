@@ -1,0 +1,28 @@
+<!ELEMENT salles (salle*)>
+
+<!ELEMENT salle (nom, informations, presentation, concerts?)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT informations (adresse, telephone)>
+<!ELEMENT adresse (#PCDATA)>
+<!ELEMENT telephone (#PCDATA)>
+<!ELEMENT presentation (#PCDATA)>
+
+<!ELEMENT concerts (concert*)>
+<!ELEMENT concert (titre, date, description, tour_de_chant)>
+<!ELEMENT titre (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+
+<!ELEMENT tour_de_chant (chanson+)>
+<!ELEMENT chanson (titre, auteurs, compositeurs, texte, interpretes)>
+<!ELEMENT auteurs (#PCDATA)>
+<!ELEMENT compositeurs (#PCDATA)>
+<!ELEMENT texte (#PCDATA)>
+<!ELEMENT interpretes (artiste+)>
+
+<!ELEMENT artiste (nom, prenom, date_naissance, photo?, site_web?, biographie)>
+<!ELEMENT prenom (#PCDATA)>
+<!ELEMENT date_naissance (#PCDATA)>
+<!ELEMENT photo (#PCDATA)>
+<!ELEMENT site_web (#PCDATA)>
+<!ELEMENT biographie (#PCDATA)>

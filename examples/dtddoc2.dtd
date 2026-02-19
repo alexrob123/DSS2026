@@ -1,0 +1,4 @@
+<!ELEMENT address EMPTY>
+<!ATTLIST address name CDATA #REQUIRED>
+<!ATTLIST address company CDATA #IMPLIED>
+<!ATTLIST address phone CDATA #REQUIRED>

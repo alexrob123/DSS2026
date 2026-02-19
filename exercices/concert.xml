@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE salles SYSTEM "concert.dtd">
+
+<salles>
+
+    <salle>
+        <nom>L'Olympia</nom>
+        <informations>
+            <adresse>28 Boulevard des Capucines, 75009 Paris, France</adresse>
+            <telephone>+33 1 47 42 25 22</telephone>
+        </informations>
+        <presentation>Salle mythique accueillant des concerts depuis 1888.</presentation>
+
+        <concerts>
+            <concert>
+                <titre>Soirée Jazz</titre>
+                <date>2026-03-15</date>
+                <description>Une soirée exceptionnelle avec les plus grands artistes de jazz.</description>
+                <tour_de_chant>
+                    <chanson>
+                        <titre>Autumn Leaves</titre>
+                        <auteurs>Joseph Kosma</auteurs>
+                        <compositeurs>Johnny Mercer</compositeurs>
+                        <texte>Standard de jazz repris par de nombreux artistes.</texte>
+                        <interpretes>
+                            <artiste>
+                                <nom>Smith</nom>
+                                <prenom>John</prenom>
+                                <date_naissance>1985-07-12</date_naissance>
+                                <photo>john_smith.jpg</photo>
+                                <site_web>http://www.johnsmithmusic.com</site_web>
+                                <biographie>Chanteur de jazz reconnu internationalement.</biographie>
+                            </artiste>
+                        </interpretes>
+                    </chanson>
+
+                    <chanson>
+                        <titre>Summertime</titre>
+                        <auteurs>George Gershwin</auteurs>
+                        <compositeurs>DuBose Heyward</compositeurs>
+                        <texte>Classique interprété par plusieurs artistes lors de soirées caritatives.</texte>
+                        <interpretes>
+                            <artiste>
+                                <nom>Doe</nom>
+                                <prenom>Jane</prenom>
+                                <date_naissance>1990-02-23</date_naissance>
+                                <biographie>Chanteuse de jazz et blues.</biographie>
+                            </artiste>
+                            <artiste>
+                                <nom>Brown</nom>
+                                <prenom>Mike</prenom>
+                                <date_naissance>1988-11-10</date_naissance>
+                                <biographie>Compositeur et interprète de jazz.</biographie>
+                            </artiste>
+                        </interpretes>
+                    </chanson>
+                </tour_de_chant>
+            </concert>
+        </concerts>
+
+    </salle>
+
+</salles>

@@ -1,0 +1,18 @@
+<!ELEMENT entreprise (personnes, projets)>
+
+<!ELEMENT personnes (personne*)>
+<!ELEMENT personne (nom, informations, projets_participes?)>
+<!ATTLIST personne id ID #REQUIRED>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT informations (#PCDATA)>
+<!ELEMENT projets_participes (projet_ref*)>
+<!ELEMENT projet_ref EMPTY>
+<!ATTLIST projet_ref ref IDREF #REQUIRED>
+
+<!ELEMENT projets (projet*)>
+<!ELEMENT projet (nom, descriptif, participants?)>
+<!ATTLIST projet id ID #REQUIRED>
+<!ELEMENT descriptif (#PCDATA)>
+<!ELEMENT participants (personne_ref*)>
+<!ELEMENT personne_ref EMPTY>
+<!ATTLIST personne_ref ref IDREF #REQUIRED>

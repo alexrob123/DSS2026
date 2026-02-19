@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE brèves SYSTEM "news.dtd">
+
+<brèves>
+
+    <brève thème="sport" langue="fr">
+        <titre>Victoire spectaculaire du PSG</titre>
+        <date>2026-02-18</date>
+        <photo>psg_victoire.jpg</photo>
+        <urls>
+            <url>
+                <adresse>https://www.lequipe.fr/psg-match</adresse>
+                <résumé>Résumé du match PSG vs Lyon et analyse des buts.</résumé>
+            </url>
+            <url>
+                <adresse>https://www.sport.fr/article123</adresse>
+                <résumé>Interview du coach après le match.</résumé>
+            </url>
+        </urls>
+    </brève>
+
+    <brève thème="bourse" langue="en">
+        <titre>Stock market sees slight increase</titre>
+        <date>2026-02-17</date>
+        <urls>
+            <url>
+                <adresse>https://www.finance.com/article456</adresse>
+                <résumé>Markets react positively to new economic data.</résumé>
+            </url>
+        </urls>
+    </brève>
+
+    <brève thème="actualités" langue="fr">
+        <titre>Nouveau projet de loi adopté</titre>
+        <date>2026-02-16</date>
+    </brève>
+
+</brèves>
