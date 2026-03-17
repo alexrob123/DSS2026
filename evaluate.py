@@ -24,13 +24,15 @@ def failure_situation(student_row, num_exos, index=None):
 # --------------------------------------------------------------------------------
 
 
-def evaluate_xml_dtd(students, hw_dir, output_csv, num_exos=5):
+def evaluate_xml_dtd(students, hw_dir, num_exos=5):
     """
     Evaluates student submissions for XML/DTD exercises.
     The hw_dir should contain zipped folders for each student, each containing
     their XML and DTD files for the exercises under format `exo_{i}.ext` (e.g.,
     exo_1.xml, exo_1.dtd).
     """
+    out_csv = Path("./evaluation") / "tp1_evaluation.csv"
+    out_csv.parent.mkdir(exist_ok=True)
     # Evaluation loop
     results = []
 
@@ -38,7 +40,7 @@ def evaluate_xml_dtd(students, hw_dir, output_csv, num_exos=5):
         print(f"Student {student}")
 
         student_row = {"Name": student}
-        student_zip = hw_dir / f"{student}.zip"
+        student_zip = hw_dir / "tp1" / f"{student}.zip"
 
         if not student_zip.exists():
             student_row = failure_situation(student_row, num_exos)
@@ -87,8 +89,8 @@ def evaluate_xml_dtd(students, hw_dir, output_csv, num_exos=5):
     df["Total"] = df[[exo for exo in range(1, num_exos + 1)]].sum(axis=1)
 
     # Save to CSV
-    df.to_csv(output_csv, index=False)
-    print(f"Evaluation saved to {output_csv}.")
+    df.to_csv(out_csv, index=False)
+    print(f"Evaluation saved to {out_csv}.")
 
 
 #################################################################################
@@ -118,15 +120,13 @@ def evaluate_xml_dtd(students, hw_dir, output_csv, num_exos=5):
     help="TP identifier (used to name output CSV).",
 )
 def main(students, hw_dir, tp):
-    out_csv = Path("./evaluation") / f"{hw_dir.name}.csv"
-    out_csv.parent.mkdir(exist_ok=True)
 
     students_df = pd.read_csv(students)
     name_col = "Name" if "Name" in students_df else students_df.columns[0]
     students = students_df[name_col].dropna().astype(str).tolist()
 
     if tp == 1:
-        evaluate_xml_dtd(students, hw_dir, out_csv, num_exos=5)
+        evaluate_xml_dtd(students, hw_dir, num_exos=5)
     else:
         raise NotImplementedError(f"TP {tp} evaluation is not implemented.")
 
