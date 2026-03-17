@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<carnet>
+    <address name="Beatrice Napolitano" id="_1">
+        <company>Paris-Dauphine</company>
+        <phone>0612345678</phone>
+    </address>
+    <address id="_2">
+        <company>Paris-Dauphine</company>
+        <phone>0712141618</phone>
+    </address>
+</carnet>
