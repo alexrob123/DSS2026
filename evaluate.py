@@ -35,12 +35,14 @@ def evaluate_xml_dtd(students, hw_dir, output_csv, num_exos=5):
     results = []
 
     for student in students:
+        print(f"Student {student}")
+
         student_row = {"Name": student}
         student_zip = hw_dir / f"{student}.zip"
 
         if not student_zip.exists():
             student_row = failure_situation(student_row, num_exos)
-            print(f"Student {student} | No zip")
+            print("\t No zip")
 
         else:
             for exo in range(1, num_exos + 1):
@@ -64,18 +66,19 @@ def evaluate_xml_dtd(students, hw_dir, output_csv, num_exos=5):
                             try:
                                 valid = validate(str(xml_path), str(dtd_path))
                                 student_row[exo] = 1 if valid else 0
+                                print(f"\t Exo {exo} OK: {valid}")
                             except Exception:
                                 student_row = failure_situation(
                                     student_row, num_exos, index=exo
                                 )
-                                print(f"Student {student} | Exo {exo} validation error")
+                                print(f"\t Exo {exo} validation error")
                         else:
                             student_row[exo] = 0
-                            print(f"Student {student} | Exo {exo} missing files")
+                            print(f"\t Exo {exo} missing files")
 
                 except zipfile.BadZipFile:
                     student_row = failure_situation(student_row, num_exos, index=exo)
-                    print(f"Student {student} | Bad zip file")
+                    print(f"\t Bad zip file for student {student}")
 
         results.append(student_row)
 
