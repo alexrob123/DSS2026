@@ -1,3 +1,4 @@
+import importlib.util
 import tempfile
 import zipfile
 from pathlib import Path
@@ -7,32 +8,101 @@ import pandas as pd
 
 from xmldtd.utils import validate
 
+STUDENTS_CSV = Path("./students.csv")
+SUBMISSION_DIR = Path("./submission")
+EVALUATION_DIR = Path("./evaluation")
+MAP_TP = {1: "tp-xml-dtd", 2: "tp-dom"}
+
+
 # Utils
 # --------------------------------------------------------------------------------
 
 
-def failure_situation(student_row, num_exos, index=None):
+def get_students(csv):
+    df = pd.read_csv(csv)
+    name_col = "Name" if "Name" in df else df.columns[0]
+    return df[name_col].dropna().astype(str).tolist()
+
+
+def failure_situation(row, num_exos, index=None):
     if index is not None:
-        student_row[index] = 0
+        row[index] = 0
     else:
         for exo in range(1, num_exos + 1):
-            student_row[exo] = 0
-    return student_row
+            row[exo] = 0
+    return row
+
+
+# class Evaluation:
+#     def __init__(self, tp, num_exos, ext):
+#         self.tp = tp
+#         self.num_exos = num_exos
+#         self.ext = ext
+
+#         self.students = self._get_students(STUDENTS_CSV)
+#         self.results = []
+
+
+#     def _check_submsission(self, student, tp, ext):
+#         expected_path = SUBMISSION_DIR / MAP_TP[tp] / f"{student}.{ext}"
+#         return expected_path.exists(), expected_path
+
+#     def _failure_situation(self, row, num_exos, index=None):
+#         if index is not None:
+#             row[index] = 0
+#         else:
+#             for exo in range(1, num_exos + 1):
+#                 row[exo] = 0
+#         return row
+
+#     def evaluation_loop(self, tp, ext):
+#         for student in self.students:
+#             print(f"Student {student}")
+#             student_row = {"Name": student}
+
+#             submission_flag, submission_path = self._check_submsission(
+#                 student,
+#                 tp=tp,
+#                 ext=ext,
+#             )
+
+#             if not submission_flag:
+#                 student_row = self._failure_situation(student_row, self.num_exos)
+#                 print("\t No submission")
+
+#             else:
 
 
 # Evaluations
 # --------------------------------------------------------------------------------
 
 
-def evaluate_xml_dtd(students, hw_dir, num_exos=5):
+@click.group()
+def main():
+    """Main command group for evaluation."""
+
+
+@main.command()
+@click.option(
+    "--num-exos",
+    "-n",
+    type=int,
+    default=5,
+    help="Number of exercises to evaluate.",
+)
+def tp_xml_dtd(num_exos=5):
     """
     Evaluates student submissions for XML/DTD exercises.
     The hw_dir should contain zipped folders for each student, each containing
     their XML and DTD files for the exercises under format `exo_{i}.ext` (e.g.,
     exo_1.xml, exo_1.dtd).
     """
-    out_csv = Path("./evaluation") / "tp1_evaluation.csv"
-    out_csv.parent.mkdir(exist_ok=True)
+
+    input_dir = SUBMISSION_DIR / "tp-xml-dtd"
+    output_path = EVALUATION_DIR / "eval_xml_dtd.csv"
+
+    students = get_students(str(STUDENTS_CSV))
+
     # Evaluation loop
     results = []
 
@@ -40,7 +110,7 @@ def evaluate_xml_dtd(students, hw_dir, num_exos=5):
         print(f"Student {student}")
 
         student_row = {"Name": student}
-        student_zip = hw_dir / "tp1" / f"{student}.zip"
+        student_zip = input_dir / f"{student}.zip"
 
         if not student_zip.exists():
             student_row = failure_situation(student_row, num_exos)
@@ -89,8 +159,8 @@ def evaluate_xml_dtd(students, hw_dir, num_exos=5):
     df["Total"] = df[[exo for exo in range(1, num_exos + 1)]].sum(axis=1)
 
     # Save to CSV
-    df.to_csv(out_csv, index=False)
-    print(f"Evaluation saved to {out_csv}.")
+    df.to_csv(output_path, index=False)
+    print(f"Evaluation saved to {output_path}.")
 
 
 #################################################################################
@@ -98,37 +168,112 @@ def evaluate_xml_dtd(students, hw_dir, num_exos=5):
 #################################################################################
 
 
-@click.command()
+@main.command()
 @click.option(
-    "--students",
-    "-s",
-    type=click.Path(exists=True, dir_okay=True, path_type=Path),
-    default="./students.csv",
-    help="CSV file with student names.",
+    "--num-exos",
+    "-n",
+    type=int,
+    default=9,
+    help="Number of exercises to evaluate.",
 )
 @click.option(
-    "--hw-dir",
-    "--dir",
-    "-h",
-    "-d",
-    type=click.Path(exists=True, file_okay=False, path_type=Path),
-    help="Directory containing student submissions (homework dir).",
+    "--ref-script",
+    "--ref",
+    "-r",
+    "ref_script",
+    type=click.Path(exists=True, file_okay=True, path_type=Path),
+    help="Path to the reference implementation file (e.g., tp_dom_ref.py).",
 )
 @click.option(
-    "--tp",
-    type=click.INT,
-    help="TP identifier (used to name output CSV).",
+    "--xml-file",
+    "--test",
+    "-t",
+    "test_file",
+    type=click.Path(exists=True, file_okay=True, path_type=Path),
+    help="Path to the XML file used for testing student functions.",
 )
-def main(students, hw_dir, tp):
+def tp_dom(num_exos, ref_script, test_file):
+    """
+    Evaluates student submissions for DOM exercises.
+    The hw_dir should contain py folders for each student, each containing
+    their functions for the exercises under format `q{i}(xml_file)` (e.g.,
+    q1(xml_file)).
+    """
 
-    students_df = pd.read_csv(students)
-    name_col = "Name" if "Name" in students_df else students_df.columns[0]
-    students = students_df[name_col].dropna().astype(str).tolist()
+    input_dir = SUBMISSION_DIR / "tp-dom"
+    output_path = EVALUATION_DIR / "eval_dom.csv"
 
-    if tp == 1:
-        evaluate_xml_dtd(students, hw_dir, num_exos=5)
-    else:
-        raise NotImplementedError(f"TP {tp} evaluation is not implemented.")
+    students = get_students(str(STUDENTS_CSV))
+
+    # Load reference answers
+    spec = importlib.util.spec_from_file_location("ref_module", ref_script)
+    ref_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ref_module)
+
+    ref_answers = {}
+    for i in range(1, num_exos + 1):
+        func_name = f"q{i}"
+        if hasattr(ref_module, func_name):
+            ref_func = getattr(ref_module, func_name)
+            ref_answers[i] = ref_func(str(test_file))
+        else:
+            print(f"Reference function {func_name} not found in {ref_script}.")
+            ref_answers[i] = None
+
+    # Evaluation loop
+    results = []
+
+    for student in students:
+        print(f"Student {student}")
+
+        student_row = {"Name": student}
+        student_py = input_dir / f"{student}.py"
+
+        if not student_py.exists():
+            student_row = failure_situation(student_row, num_exos)
+            print("\t No script found")
+
+        else:
+            spec = importlib.util.spec_from_file_location(
+                f"{student}_module", student_py
+            )
+            student_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(student_module)
+
+            for i in range(1, num_exos + 1):
+                func_name = f"q{i}"
+                if hasattr(student_module, func_name):
+                    student_func = getattr(student_module, func_name)
+                    try:
+                        student_answer = student_func(str(test_file))
+                        student_row[i] = 1 if student_answer == ref_answers[i] else 0
+                        print(f"\t {func_name} OK: {student_answer == ref_answers[i]}")
+                        if not student_answer == ref_answers[i]:
+                            print(
+                                f"\t\t Expected: \n{ref_answers[i]} \n Got: \n{student_answer}"
+                            )
+
+                    except Exception:
+                        student_row = failure_situation(student_row, num_exos, index=i)
+                        print(f"\t {func_name} execution error")
+                else:
+                    student_row[i] = 0
+                    print(f"\t {func_name} not found")
+
+        results.append(student_row)
+
+    # Build and enrich df
+    df = pd.DataFrame(results)
+    df["Total"] = df[[exo for exo in range(1, num_exos + 1)]].sum(axis=1)
+
+    # Save to CSV
+    df.to_csv(output_path, index=False)
+    print(f"Evaluation saved to {output_path}.")
+
+
+#################################################################################
+#################################################################################
+#################################################################################
 
 
 if __name__ == "__main__":
