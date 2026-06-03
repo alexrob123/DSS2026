@@ -1,0 +1,1 @@
+uv run evaluate.py agg

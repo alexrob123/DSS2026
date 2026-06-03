@@ -2,6 +2,7 @@ import importlib.util
 import json
 import tempfile
 import zipfile
+from functools import reduce
 from pathlib import Path
 
 import click
@@ -20,8 +21,15 @@ STUDENTS_CSV = Path("./submission/students.csv")
 # --------------------------------------------------------------------------------
 
 
+def read_csv(path):
+    df = pd.read_csv(path, skipinitialspace=True)
+    df.columns = df.columns.str.strip()
+    df["Name"] = df["Name"].str.strip()
+    return df
+
+
 def get_students(csv):
-    df = pd.read_csv(csv)
+    df = read_csv(csv)
     name_col = "Name" if "Name" in df else df.columns[0]
     return df[name_col].dropna().astype(str).tolist()
 
@@ -310,7 +318,7 @@ def tp_json(subdir, out_csv):
                             with open(schema_path) as f:
                                 schema = json.load(f)
                         except json.JSONDecodeError as e:
-                            student_row = failure_situation(student_row, 1, index=0)
+                            student_row = failure_situation(student_row, 1, index=1)
                             keep_going = False
                             print(f"\t JSON parsing error: {e}")
 
@@ -332,15 +340,15 @@ def tp_json(subdir, out_csv):
                                 validator = Draft7Validator(schema)
                                 errors = list(validator.iter_errors(data))
                                 if errors:
-                                    student_row[0] = 0
+                                    student_row[1] = 0
                                     print(
                                         f"\t Validation errors: {[e.message for e in errors]}"
                                     )
                                 else:
-                                    student_row[0] = 1
+                                    student_row[1] = 1
                                     print("\t OK")
             except zipfile.BadZipFile:
-                student_row = failure_situation(student_row, 1, index=0)
+                student_row = failure_situation(student_row, 1, index=1)
                 keep_going = False
                 print("\t Bad zip file")
 
@@ -360,6 +368,41 @@ def tp_json(subdir, out_csv):
 #################################################################################
 #################################################################################
 #################################################################################
+
+
+@main.command()
+@click.option("--out-csv", "-o", help="Output directory for evaluation results.", type=click.Path(path_type=Path), default="eval.csv")  # fmt: skip
+def agg(out_csv):
+    """
+    Aggregates results from different evaluations into a single CSV.
+    """
+
+    input_dir = EVALUATION_DIR
+    output_path = EVALUATION_DIR / out_csv
+
+    # Compute score for each eval, store in a "score_{name}" column
+    dfs = {}
+    for f in Path(input_dir).glob("eval_*.csv"):
+        print(f"Loading {f}...")
+        name = f.stem.replace("eval_", "")
+        df_ = read_csv(f)
+        num_cols = len([c for c in df_.columns if c not in ("Name", "Total")])
+        df_[f"score_{name}"] = df_["Total"] / num_cols
+        dfs[name] = df_[["Name", f"score_{name}"]]  # keep only Name + score
+
+    # Merge all on Name
+    df = reduce(
+        lambda left, right: left.merge(right, on="Name", how="outer"), dfs.values()
+    )
+
+    # Sum all score columns into Total
+    score_cols = [f"score_{name}" for name in dfs]
+    df["Total"] = df[score_cols].sum(axis=1)
+    df["Total/20"] = df["Total"] / df[score_cols].count(axis=1) * 20
+
+    # Save to CSV
+    df.to_csv(output_path, index=False)
+    print(f"Evaluation saved to {output_path}.")
 
 
 if __name__ == "__main__":
