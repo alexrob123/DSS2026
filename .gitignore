@@ -1,7 +1,9 @@
 # Private files
 *students*
 evaluation/*
-/submission/*
+!evaluation/.gitkeep
+submission/*
+!submission/.gitkeep
 *PERSO*
 
 # Python-generated files
