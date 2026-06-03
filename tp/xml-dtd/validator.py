@@ -45,4 +45,4 @@ if __name__ == "__main__":
 # python3 validator.py xmldoc2.xml dtddoc2.dtd
 # python3 validator.py xmldoc3.xml dtddoc2.dtd
 
-# Note: for the fucntion to work, the DTD file should not start with <!DOCTYPE ... [ ]>
+# Note: for the function to work, the DTD file should not start with <!DOCTYPE ... [ ]>
