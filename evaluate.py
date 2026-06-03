@@ -1,17 +1,19 @@
 import importlib.util
+import json
 import tempfile
 import zipfile
 from pathlib import Path
 
 import click
+import jsonschema
 import pandas as pd
+from jsonschema import Draft7Validator
 
 from xmldtd.utils import validate
 
-STUDENTS_CSV = Path("./students.csv")
-SUBMISSION_DIR = Path("./submission")
 EVALUATION_DIR = Path("./evaluation")
-MAP_TP = {1: "tp-xml-dtd", 2: "tp-dom"}
+SUBMISSION_DIR = Path("./submission")
+STUDENTS_CSV = Path("./submission/students.csv")
 
 
 # Utils
@@ -33,46 +35,6 @@ def failure_situation(row, num_exos, index=None):
     return row
 
 
-# class Evaluation:
-#     def __init__(self, tp, num_exos, ext):
-#         self.tp = tp
-#         self.num_exos = num_exos
-#         self.ext = ext
-
-#         self.students = self._get_students(STUDENTS_CSV)
-#         self.results = []
-
-
-#     def _check_submsission(self, student, tp, ext):
-#         expected_path = SUBMISSION_DIR / MAP_TP[tp] / f"{student}.{ext}"
-#         return expected_path.exists(), expected_path
-
-#     def _failure_situation(self, row, num_exos, index=None):
-#         if index is not None:
-#             row[index] = 0
-#         else:
-#             for exo in range(1, num_exos + 1):
-#                 row[exo] = 0
-#         return row
-
-#     def evaluation_loop(self, tp, ext):
-#         for student in self.students:
-#             print(f"Student {student}")
-#             student_row = {"Name": student}
-
-#             submission_flag, submission_path = self._check_submsission(
-#                 student,
-#                 tp=tp,
-#                 ext=ext,
-#             )
-
-#             if not submission_flag:
-#                 student_row = self._failure_situation(student_row, self.num_exos)
-#                 print("\t No submission")
-
-#             else:
-
-
 # Evaluations
 # --------------------------------------------------------------------------------
 
@@ -88,9 +50,9 @@ def main():
 
 
 @main.command()
-@click.option("--subdir", "-s",                 help="Subdir name in submission dir.",                  type=click.Path(exists=True, path_type=Path), default="tp-xml-dtd")  # fmt: skip
-@click.option("--num-exos", "-n",               help="Number of exercises to evaluate.",                type=int, default=5)  # fmt: skip
-@click.option("--out-csv", "-o",                 help="Output directory for evaluation results.",        type=click.Path(path_type=Path), default="eval_xml_dtd.csv")  # fmt: skip
+@click.option("--subdir", "-s",     help="Subdir name in submission dir.",              type=click.Path(path_type=Path), default="tp-xml-dtd")  # fmt: skip
+@click.option("--num-exos", "-n",   help="Number of exercises to evaluate.",            type=int, default=5)  # fmt: skip
+@click.option("--out-csv", "-o",    help="Output directory for evaluation results.",    type=click.Path(path_type=Path), default="eval_xml_dtd.csv")  # fmt: skip
 def tp_xml_dtd(subdir, num_exos, out_csv):
     """
     Evaluates student submissions for XML/DTD exercises.
@@ -180,11 +142,11 @@ def tp_xml_dtd(subdir, num_exos, out_csv):
 
 
 @main.command()
-@click.option("--subdir", "-s",                 help="Subdir name in submission dir.",                  type=click.Path(exists=True, path_type=Path), default="tp-dom")  # fmt: skip
-@click.option("--num-exos", "-n",               help="Number of exercises to evaluate.",                type=int, default=9)  # fmt: skip
+@click.option("--subdir", "-s",             help="Subdir name in submission dir.",                  type=click.Path(path_type=Path), default="tp-dom")  # fmt: skip
+@click.option("--num-exos", "-n",           help="Number of exercises to evaluate.",                type=int, default=9)  # fmt: skip
 @click.option("--ref-py", "--ref", "-r",    help="Path to py reference script (e.g., tp_dom.py).",  type=click.Path(exists=True, path_type=Path))  # fmt: skip
-@click.option("--test-xml", "--test", "-t",     help="Path to the XML test file (e.g., tp_dom.xml).",   type=click.Path(exists=True, path_type=Path))  # fmt: skip
-@click.option("--out-csv", "-o",                 help="Output directory for evaluation results.",        type=click.Path(path_type=Path), default="eval_dom.csv")  # fmt: skip
+@click.option("--test-xml", "--test", "-t", help="Path to the XML test file (e.g., tp_dom.xml).",   type=click.Path(exists=True, path_type=Path))  # fmt: skip
+@click.option("--out-csv", "-o",            help="Output directory for evaluation results.",        type=click.Path(path_type=Path), default="eval_dom.csv")  # fmt: skip
 def tp_dom(subdir, num_exos, ref_py, test_xml, out_csv):
     """
     Evaluates student submissions for DOM exercises.
@@ -267,6 +229,128 @@ def tp_dom(subdir, num_exos, ref_py, test_xml, out_csv):
     # Build and enrich df
     df = pd.DataFrame(results)
     df["Total"] = df[[exo for exo in range(1, num_exos + 1)]].sum(axis=1)
+
+    # Save to CSV
+    df.to_csv(output_path, index=False)
+    print(f"Evaluation saved to {output_path}.")
+
+
+#################################################################################
+#################################################################################
+#################################################################################
+
+
+@main.command()
+@click.option("--subdir", "-s",  help="Subdir name in submission dir.",           type=click.Path(path_type=Path), default="tp-json")  # fmt: skip
+@click.option("--out-csv", "-o", help="Output directory for evaluation results.", type=click.Path(path_type=Path), default="eval_json.csv")  # fmt: skip
+def tp_json(subdir, out_csv):
+    """
+    Evaluates student submissions for JSON exercises.
+    The submission/subdir directory should contain student submissions.
+
+    Required format is:
+    ```
+    NOM-DE-FAMILLE.zip
+    ├── data.json
+    └── schema.json
+    ```
+
+    Default usage:
+    ```
+    uv run evaluate.py tp-json
+    ```
+    """
+
+    input_dir = SUBMISSION_DIR / subdir
+    output_path = EVALUATION_DIR / out_csv
+
+    students = get_students(str(STUDENTS_CSV))
+
+    # Evaluation loop
+    results = []
+
+    for student in students:
+        print(f"Student {student}")
+
+        student_row = {"Name": student}
+        student_zip = input_dir / f"{student}.zip"
+
+        if not student_zip.exists():
+            student_row = failure_situation(student_row, 1)
+            print("\t No zip")
+
+        else:
+            json_name = "data.json"
+            schema_name = "schema.json"
+
+            keep_going = True
+
+            # zip
+            print("\t Processing zip file...")
+            try:
+                with (
+                    zipfile.ZipFile(student_zip, "r") as zf,
+                    tempfile.TemporaryDirectory() as tmpdir,
+                ):
+                    zf.extractall(tmpdir)
+                    extracted_root = Path(tmpdir)
+
+                    json_matches = list(extracted_root.rglob(json_name))
+                    schema_matches = list(extracted_root.rglob(schema_name))
+
+                    if keep_going and json_matches and schema_matches:
+                        print("\t Loading files...")
+                        json_path = json_matches[0]
+                        schema_path = schema_matches[0]
+
+                        # parse files
+                        try:
+                            with open(json_path) as f:
+                                data = json.load(f)
+                            with open(schema_path) as f:
+                                schema = json.load(f)
+                        except json.JSONDecodeError as e:
+                            student_row = failure_situation(student_row, 1, index=0)
+                            keep_going = False
+                            print(f"\t JSON parsing error: {e}")
+
+                        # check schema format
+
+                        if keep_going:
+                            print("\t Validating schema...")
+                            try:
+                                Draft7Validator.check_schema(schema)
+                            except jsonschema.SchemaError as e:
+                                student_row = failure_situation(student_row, 1, index=0)
+                                keep_going = False
+                                print(f"\t Schema error: {e.message}")
+
+                            # validate data against schema
+                            if keep_going:
+                                print("\t Validating data against schema...")
+
+                                validator = Draft7Validator(schema)
+                                errors = list(validator.iter_errors(data))
+                                if errors:
+                                    student_row[0] = 0
+                                    print(
+                                        f"\t Validation errors: {[e.message for e in errors]}"
+                                    )
+                                else:
+                                    student_row[0] = 1
+                                    print("\t OK")
+            except zipfile.BadZipFile:
+                student_row = failure_situation(student_row, 1, index=0)
+                keep_going = False
+                print("\t Bad zip file")
+
+            print("\t Done")
+
+        results.append(student_row)
+
+    # Build and enrich df
+    df = pd.DataFrame(results)
+    df["Total"] = df[[exo for exo in range(1, 1 + 1)]].sum(axis=1)
 
     # Save to CSV
     df.to_csv(output_path, index=False)
