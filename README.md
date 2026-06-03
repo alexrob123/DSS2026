@@ -4,5 +4,5 @@ This repo supports the **Semi-Structured Data** course at **Université Paris-Da
 
 ### Evaluation
 
-Evaluation is run through the `evaluate.py` function. Pre-requisites are a `students.csv` with a `name` attribute, and a `submission` directory with students submissions in corresponding subdir (`tp-xml-dtd`, `tp-dom`, ...) with the naming convention `NAME.zip`.
+Evaluation is run through the `evaluate.py` function. Pre-requisites are a `submission` directory with students submissions in corresponding subdir (`tp-xml-dtd`, `tp-dom`, `tp-json`, ...) with the naming convention `NAME.zip`, and a `submission/students.csv` with a `name` attribute.
 
